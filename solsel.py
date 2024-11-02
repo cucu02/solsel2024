@@ -6,7 +6,7 @@ from streamlit_echarts import st_echarts
 # ID dari Google Sheets dan API Key
 SHEET_ID = "11VpCK1BHH74-LOL6dMT8g4W28c_a9Ialf-Gu2CLAfSo"
 API_KEY = "AIzaSyD48O12Pwu9KE3o9Gl0YO1JM0hSUiwR3k8"
-RANGE = "Sheet1!A1:L1000"
+RANGE = "Sheet1!A1:J1000"
 
 # Membuat URL API untuk mengakses data dari Google Sheets
 url = f"https://sheets.googleapis.com/v4/spreadsheets/{SHEET_ID}/values/{RANGE}?key={API_KEY}"
@@ -24,11 +24,10 @@ if response.status_code == 200:
         df = pd.DataFrame(values[1:], columns=values[0])
         
         # Konversi kolom numerik
-        df['Jumlah DPT'] = pd.to_numeric(df['Jumlah DPT'], errors='coerce')
         df['Suara 01'] = pd.to_numeric(df['Suara 01'], errors='coerce')
         df['Suara 02'] = pd.to_numeric(df['Suara 02'], errors='coerce')
-        df['Jumlah Suara sah'] = pd.to_numeric(df['Jumlah Suara sah'], errors='coerce')
-        df['Jumlah Suara tidak sah'] = pd.to_numeric(df['Jumlah Suara tidak sah'], errors='coerce')
+        df['Suara Sah'] = pd.to_numeric(df['Suara Sah'], errors='coerce')
+        df['Suara Tidak Sah'] = pd.to_numeric(df['Suara Tidak Sah'], errors='coerce')
 
         # Mengelompokkan data berdasarkan kecamatan dan menjumlahkan nilai suara
         df_grouped = df.groupby('Kecamatan', as_index=False).agg({
@@ -39,7 +38,7 @@ if response.status_code == 200:
         # Hitung total perolehan Suara 01, Suara 02, dan Jumlah Suara tidak sah
         total_suara_01 = df_grouped['Suara 01'].sum()  # Total Suara 01
         total_suara_02 = df_grouped['Suara 02'].sum()  # Total Suara 02
-        total_suara_tidak_sah = df['Jumlah Suara tidak sah'].sum()  # Total Suara tidak sah
+        total_suara_tidak_sah = df['Suara Tidak Sah'].sum()  # Total Suara Tidak Sah
 
         # Hitung jumlah TPS terisi dan belum terisi berdasarkan jumlah baris di kolom Nomor TPS
         tps_terisi = int(df['Nomor TPS'].count())  # Menghitung jumlah baris yang terisi
@@ -53,7 +52,7 @@ if response.status_code == 200:
         # Hitung data penting
         jumlah_kecamatan = len(df_grouped)  # Hitung jumlah kecamatan setelah pengelompokan
         jumlah_nagari = 39
-        total_dpt = 129.428  # Konversi ke tipe int
+        total_dpt = 129428  # Total jumlah DPT sebagai nilai tetap
 
         # Metrics Layout
         col1, col2, col3 = st.columns(3)
@@ -68,11 +67,11 @@ if response.status_code == 200:
         with col4:
             st.metric("Jumlah DPT", total_dpt)
         with col5:
-            st.metric("Total Jumlah Suara Tidak Sah", total_suara_tidak_sah)  # Ganti dengan Total Jumlah Suara Tidak Sah
+            st.metric("Total Jumlah Suara Tidak Sah", total_suara_tidak_sah)
         with col6:
-            st.metric("Total Perolehan Suara 01", total_suara_01)  # Ganti dengan total Suara 01
+            st.metric("Total Perolehan Suara 01", total_suara_01)
         with col7:
-            st.metric("Total Perolehan Suara 02", total_suara_02)  # Ganti dengan total Suara 02
+            st.metric("Total Perolehan Suara 02", total_suara_02)
 
         # Layout untuk menampilkan dua chart berdampingan
         col_chart1, col_chart2 = st.columns(2)
@@ -83,8 +82,8 @@ if response.status_code == 200:
             
             option_bar_race = {
                 "legend": {
-                    "data": ["Perolehan Suara 01", "Perolehan Suara 02"],  # Tambahkan legend
-                    "top": "5%"  # Letakkan legend di bagian atas
+                    "data": ["Perolehan Suara 01", "Perolehan Suara 02"],
+                    "top": "5%"
                 },
                 "tooltip": {
                     "trigger": "axis",
@@ -97,33 +96,33 @@ if response.status_code == 200:
                 },
                 "yAxis": {
                     "type": "category",
-                    "data": df_grouped['Kecamatan'].tolist()  # Kecamatan setelah pengelompokan
+                    "data": df_grouped['Kecamatan'].tolist()
                 },
                 "series": [
                     {
                         "name": "Perolehan Suara 01",
                         "type": "bar",
-                        "data": df_grouped['Suara 01'].astype(int).tolist(),  # Pastikan tipe int
+                        "data": df_grouped['Suara 01'].astype(int).tolist(),
                         "label": {
                             "show": True,
                             "position": "right",
                             "valueAnimation": True
                         },
                         "itemStyle": {
-                            "color": "#fac858"  # Warna untuk Suara 01
+                            "color": "#fac858"
                         }
                     },
                     {
                         "name": "Perolehan Suara 02",
                         "type": "bar",
-                        "data": df_grouped['Suara 02'].astype(int).tolist(),  # Pastikan tipe int
+                        "data": df_grouped['Suara 02'].astype(int).tolist(),
                         "label": {
                             "show": True,
                             "position": "right",
                             "valueAnimation": True
                         },
                         "itemStyle": {
-                            "color": "#5470c6"  # Warna untuk Suara 02
+                            "color": "#5470c6"
                         }
                     }
                 ],
@@ -149,7 +148,7 @@ if response.status_code == 200:
                 },
                 "series": [
                     {
-                        "name": "Dari dari TPS",
+                        "name": "Status TPS",
                         "type": "pie",
                         "radius": ["40%", "70%"],
                         "avoidLabelOverlap": False,
@@ -173,8 +172,8 @@ if response.status_code == 200:
                             "show": False
                         },
                         "data": [
-                            {"value": int(tps_terisi), "name": "TPS Sudah Mengirim"},  # Konversi ke int
-                            {"value": int(tps_belum_terisi), "name": "TPS Belum Mengirim"}  # Konversi ke int
+                            {"value": tps_terisi, "name": "TPS Sudah Mengirim"},
+                            {"value": tps_belum_terisi, "name": "TPS Belum Mengirim"}
                         ]
                     }
                 ]
@@ -186,6 +185,7 @@ if response.status_code == 200:
         st.write("Tidak ada data yang ditemukan.")
 else:
     st.write(f"Error: {response.status_code}, {response.text}")
+
 # Footer
 st.markdown("""
     Dikembangkan oleh [Cucu Anduang](https://gis.dukcapil.kemendagri.go.id/peta/), Untuk korespondensi hubungi sefridoni@duck.com
