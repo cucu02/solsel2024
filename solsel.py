@@ -175,5 +175,5 @@ else:
 
 # Footer
 st.markdown("""
-    Dikembangkan oleh [Cucu Anduang](https://gis.dukcapil.kemendagri.go.id/peta/), Untuk korespondensi hubungi sefridoni@duck.com
+    Dikembangkan oleh [Cucu Anduang](https://scholar.google.com/citations?user=RUg3RQUAAAAJ&hl=id&oi=ao), Untuk korespondensi hubungi duckblurry-royal-coma@duck.com
 """, unsafe_allow_html=True)
