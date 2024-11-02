@@ -134,11 +134,11 @@ if response.status_code == 200:
 
             st_echarts(options=option_bar_race, height="600px")
 
-        # Chart 2: Jumlah TPS terisi dan belum terisi
+        # Chart 2: Total Perolehan Suara 01 dan Suara 02 dalam bentuk Pie Chart
         with col_chart2:
-            st.subheader("Status Pengisian TPS")
+            st.subheader("Total Perolehan Suara dalam Pie Chart")
             
-            option_tps_chart = {
+            option_pie_chart = {
                 "tooltip": {
                     "trigger": "item"
                 },
@@ -148,7 +148,7 @@ if response.status_code == 200:
                 },
                 "series": [
                     {
-                        "name": "Status TPS",
+                        "name": "Total Perolehan Suara",
                         "type": "pie",
                         "radius": ["40%", "70%"],
                         "avoidLabelOverlap": False,
@@ -158,28 +158,18 @@ if response.status_code == 200:
                             "borderWidth": 2
                         },
                         "label": {
-                            "show": False,
-                            "position": "center"
-                        },
-                        "emphasis": {
-                            "label": {
-                                "show": True,
-                                "fontSize": "20",
-                                "fontWeight": "bold"
-                            }
-                        },
-                        "labelLine": {
-                            "show": False
+                            "show": True,
+                            "formatter": "{b}: {c} ({d}%)"
                         },
                         "data": [
-                            {"value": tps_terisi, "name": "TPS Sudah Mengirim"},
-                            {"value": tps_belum_terisi, "name": "TPS Belum Mengirim"}
+                            {"value": total_suara_01, "name": "Suara 01"},
+                            {"value": total_suara_02, "name": "Suara 02"}
                         ]
                     }
                 ]
             }
 
-            st_echarts(options=option_tps_chart, height="600px")
+            st_echarts(options=option_pie_chart, height="600px")
 
     else:
         st.write("Tidak ada data yang ditemukan.")
