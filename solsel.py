@@ -42,7 +42,7 @@ if response.status_code == 200:
 
         # Hitung jumlah TPS terisi dan belum terisi berdasarkan jumlah baris di kolom Nomor TPS
         tps_terisi = int(df['Nomor TPS'].count())  # Menghitung jumlah baris yang terisi
-        jumlah_tps = 599  # Total TPS (nilai tetap)
+        jumlah_tps = 347  # Total TPS (nilai tetap)
         tps_belum_terisi = jumlah_tps - tps_terisi  # TPS yang belum terisi
 
         # Mulai dashboard
@@ -52,7 +52,7 @@ if response.status_code == 200:
         # Hitung data penting
         jumlah_kecamatan = len(df_grouped)  # Hitung jumlah kecamatan setelah pengelompokan
         jumlah_nagari = 39
-        total_dpt = 129428  # Total jumlah DPT sebagai nilai tetap
+        total_dpt = 127858  # Total jumlah DPT sebagai nilai tetap
 
         # Metrics Layout
         col1, col2, col3 = st.columns(3)
@@ -150,21 +150,18 @@ if response.status_code == 200:
                     {
                         "name": "Total Perolehan Suara",
                         "type": "pie",
-                        "radius": ["40%", "70%"],
-                        "avoidLabelOverlap": False,
-                        "itemStyle": {
-                            "borderRadius": 10,
-                            "borderColor": "#fff",
-                            "borderWidth": 2
-                        },
-                        "label": {
-                            "show": True,
-                            "formatter": "{b}: {c} ({d}%)"
-                        },
+                        "radius": "50%",
                         "data": [
                             {"value": total_suara_01, "name": "Suara 01"},
                             {"value": total_suara_02, "name": "Suara 02"}
-                        ]
+                        ],
+                        "emphasis": {
+                            "label": {
+                                "show": True,
+                                "fontSize": "20",
+                                "fontWeight": "bold"
+                            }
+                        }
                     }
                 ]
             }
