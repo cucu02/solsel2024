@@ -36,9 +36,9 @@ if response.status_code == 200:
         })
 
         # Hitung total perolehan Suara 01, Suara 02, dan Jumlah Suara tidak sah
-        total_suara_01 = df_grouped['Suara 01'].sum()  # Total Suara 01
-        total_suara_02 = df_grouped['Suara 02'].sum()  # Total Suara 02
-        total_suara_tidak_sah = df['Suara Tidak Sah'].sum()  # Total Suara Tidak Sah
+        total_suara_01 = int(df_grouped['Suara 01'].sum())  # Konversi ke int untuk kompatibilitas JSON
+        total_suara_02 = int(df_grouped['Suara 02'].sum())  # Konversi ke int untuk kompatibilitas JSON
+        total_suara_tidak_sah = int(df['Suara Tidak Sah'].sum())  # Konversi ke int untuk kompatibilitas JSON
 
         # Hitung jumlah TPS terisi dan belum terisi berdasarkan jumlah baris di kolom Nomor TPS
         tps_terisi = int(df['Nomor TPS'].count())  # Menghitung jumlah baris yang terisi
