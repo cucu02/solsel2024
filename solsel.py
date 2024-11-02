@@ -136,7 +136,7 @@ if response.status_code == 200:
 
         # Chart 2: Total Perolehan Suara 01 dan Suara 02 dalam bentuk Pie Chart
         with col_chart2:
-            st.subheader("Total Perolehan Suara dalam Pie Chart")
+            st.subheader("Total Perolehan Suara Paslon")
             
             option_pie_chart = {
                 "tooltip": {
