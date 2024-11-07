@@ -6,7 +6,7 @@ from streamlit_echarts import st_echarts
 # ID dari Google Sheets dan API Key
 SHEET_ID = "11VpCK1BHH74-LOL6dMT8g4W28c_a9Ialf-Gu2CLAfSo"
 API_KEY = "AIzaSyD48O12Pwu9KE3o9Gl0YO1JM0hSUiwR3k8"  # Gantilah dengan API Key yang benar
-RANGE = "Sheet3!A1:J1000"
+RANGE = "Sheet3!A1:K1000"  # Sesuaikan jangkauan untuk menyertakan kolom K
 
 # Membuat URL API untuk mengakses data dari Google Sheets
 url = f"https://sheets.googleapis.com/v4/spreadsheets/{SHEET_ID}/values/{RANGE}?key={API_KEY}"
@@ -23,6 +23,12 @@ if response.status_code == 200:
         # Konversi data ke Pandas DataFrame
         df = pd.DataFrame(values[1:], columns=values[0])
         
+        # Menampilkan kolom untuk verifikasi
+        st.write("Nama Kolom:", df.columns.tolist())
+
+        # Menghilangkan spasi tambahan pada nama kolom
+        df.columns = df.columns.str.strip()
+
         # Standarisasi kolom 'Kecamatan' untuk menghindari duplikasi akibat spasi atau kapitalisasi
         df['Kecamatan'] = df['Kecamatan'].str.strip().str.title()
 
@@ -30,7 +36,12 @@ if response.status_code == 200:
         df['Suara 01'] = pd.to_numeric(df['Suara 01'], errors='coerce').fillna(0)
         df['Suara 02'] = pd.to_numeric(df['Suara 02'], errors='coerce').fillna(0)
         df['Suara Tidak Sah'] = pd.to_numeric(df['Suara Tidak Sah'], errors='coerce').fillna(0)
-        df['DPT'] = pd.to_numeric(df['DPT'], errors='coerce').fillna(0)  # Tambahkan konversi ini
+
+        # Periksa apakah kolom 'DPT' ada setelah standarisasi nama kolom
+        if 'DPT' in df.columns:
+            df['DPT'] = pd.to_numeric(df['DPT'], errors='coerce').fillna(0)
+        else:
+            st.write("Kolom 'DPT' tidak ditemukan dalam data.")
 
         # Filter out any rows where 'Kecamatan' might contain unintended header or invalid data
         df = df[df['Kecamatan'] != 'Kecamatan']
@@ -46,7 +57,7 @@ if response.status_code == 200:
         total_suara_02 = int(df_grouped['Suara 02'].sum())
         total_suara_tidak_sah = int(df['Suara Tidak Sah'].sum())
         total_tps = df['Nomor TPS'].notna().sum()
-        total_dpt = int(df['DPT'].sum())
+        total_dpt = int(df['DPT'].sum()) if 'DPT' in df.columns else 0
 
         # Calculate unique count of Kecamatan and Nagari
         unique_kecamatan_count = df['Kecamatan'].nunique()
