@@ -5,7 +5,7 @@ from streamlit_echarts import st_echarts
 
 # ID dari Google Sheets dan API Key
 SHEET_ID = "11VpCK1BHH74-LOL6dMT8g4W28c_a9Ialf-Gu2CLAfSo"
-API_KEY = "YOUR_GOOGLE_API_KEY"
+API_KEY = "YOUR_GOOGLE_API_KEY"  # Gantilah dengan API Key yang benar
 RANGE = "Sheet3!A1:J1000"
 
 # Membuat URL API untuk mengakses data dari Google Sheets
