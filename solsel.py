@@ -119,7 +119,7 @@ if response.status_code == 200:
                         },
                         "data": df_grouped['Suara 01'].astype(int).tolist(),
                         "itemStyle": {
-                            "color": "#fac858"
+                            "color": "#fac858"  # Warna untuk Suara 01
                         }
                     },
                     {
@@ -133,7 +133,7 @@ if response.status_code == 200:
                         },
                         "data": df_grouped['Suara 02'].astype(int).tolist(),
                         "itemStyle": {
-                            "color": "#5470c6"
+                            "color": "#5470c6"  # Warna untuk Suara 02
                         }
                     }
                 ]
@@ -159,8 +159,8 @@ if response.status_code == 200:
                         "type": "pie",
                         "radius": "50%",
                         "data": [
-                            {"value": total_suara_01, "name": "Suara 01"},
-                            {"value": total_suara_02, "name": "Suara 02"}
+                            {"value": total_suara_01, "name": "Suara 01", "itemStyle": {"color": "#fac858"}},
+                            {"value": total_suara_02, "name": "Suara 02", "itemStyle": {"color": "#5470c6"}}
                         ],
                         "emphasis": {
                             "label": {
