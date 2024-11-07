@@ -47,6 +47,7 @@ if response.status_code == 200:
 
         # Calculate unique count of Kecamatan
         unique_kecamatan_count = df['Kecamatan'].nunique()
+        unique_nagari_count = df['Nagari'].nunique()
 
         # Mulai dashboard
         st.set_page_config(layout="wide", page_title="Quick Count Pilkada Solsel 2024", page_icon="🗳️")
@@ -57,7 +58,7 @@ if response.status_code == 200:
         with col1:
             st.metric("Jumlah Kecamatan", unique_kecamatan_count)  # dynamically calculated
         with col2:
-            st.metric("Jumlah Nagari", 39)
+            st.metric("Jumlah Nagari", unique_nagari_count)
         with col3:
             st.metric("Jumlah TPS", 347)
 
