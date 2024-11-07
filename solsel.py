@@ -5,6 +5,7 @@ from streamlit_echarts import st_echarts
 
 # Konfigurasi halaman harus diatur di bagian paling atas
 st.set_page_config(layout="wide", page_title="Quick Count Pilkada Solsel 2024", page_icon="🗳️")
+st.title("Quick Count Pilkada Solsel 2024")
 
 # ID dari Google Sheets dan API Key
 SHEET_ID = "11VpCK1BHH74-LOL6dMT8g4W28c_a9Ialf-Gu2CLAfSo"
@@ -25,9 +26,6 @@ if response.status_code == 200:
     if values:
         # Konversi data ke Pandas DataFrame
         df = pd.DataFrame(values[1:], columns=values[0])
-        
-        # Menampilkan kolom untuk verifikasi
-        st.write("Nama Kolom:", df.columns.tolist())
 
         # Menghilangkan spasi tambahan pada nama kolom
         df.columns = df.columns.str.strip()
@@ -88,7 +86,7 @@ if response.status_code == 200:
         # Layout untuk menampilkan dua chart berdampingan
         col_chart1, col_chart2 = st.columns(2)
 
-        # Chart 1: Segmented Bar Chart untuk Perolehan Suara Paslon
+        # Chart 1: Segmented Bar Chart untuk Perolehan Suara Paslon per Kecamatan
         with col_chart1:
             st.subheader("Perolehan Suara Paslon per Kecamatan")
             
