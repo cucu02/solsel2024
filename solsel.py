@@ -66,7 +66,7 @@ if response.status_code == 200:
 
         col4, col5, col6, col7 = st.columns(4)
         with col4:
-            st.metric("Jumlah DPT", 127858)
+            st.metric("Jumlah DPT", total_dpt)
         with col5:
             st.metric("Total Jumlah Suara Tidak Sah", total_suara_tidak_sah)
         with col6:
