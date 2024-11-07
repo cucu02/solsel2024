@@ -56,14 +56,103 @@ if response.status_code == 200:
         # Hitung total perolehan Suara 01 dan Suara 02
         total_suara_01 = int(df_grouped['Suara 01'].sum())
         total_suara_02 = int(df_grouped['Suara 02'].sum())
+        total_suara_tidak_sah = int(df['Suara Tidak Sah'].sum())
+        total_tps = df['Nomor TPS'].notna().sum()
+        total_dpt = int(df['DPT'].sum()) if 'DPT' in df.columns else 0
 
-        # Layout untuk menampilkan chart dan gambar berdampingan
-        col_chart, col_image1, col_image2 = st.columns([2, 1, 1])
+        # Calculate unique count of Kecamatan and Nagari
+        unique_kecamatan_count = df['Kecamatan'].nunique()
+        unique_nagari_count = df['Nagari'].nunique()
 
-        # Chart 2: Total Perolehan Suara 01 dan Suara 02 dalam bentuk Pie Chart
-        with col_chart:
+        # Metrics Layout
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.metric("Jumlah Kecamatan", unique_kecamatan_count)
+        with col2:
+            st.metric("Jumlah Nagari", unique_nagari_count)
+        with col3:
+            st.metric("Jumlah TPS", total_tps)
+
+        col4, col5, col6, col7 = st.columns(4)
+        with col4:
+            st.metric("Jumlah DPT", total_dpt)
+        with col5:
+            st.metric("Total Jumlah Suara Tidak Sah", total_suara_tidak_sah)
+        with col6:
+            st.metric("Total Perolehan Suara 01", total_suara_01)
+        with col7:
+            st.metric("Total Perolehan Suara 02", total_suara_02)
+
+        # Layout untuk menampilkan dua chart berdampingan
+        col_chart1, col_chart2 = st.columns(2)
+
+        # Chart 1: Segmented Bar Chart untuk Perolehan Suara Paslon per Kecamatan
+        with col_chart1:
+            st.subheader("Perolehan Suara Paslon per Kecamatan")
+            
+            option_segmented_bar = {
+                "tooltip": {
+                    "trigger": "axis",
+                    "axisPointer": {"type": "shadow"}
+                },
+                "legend": {
+                    "data": ["Suara 01", "Suara 02"],
+                    "top": "5%"
+                },
+                "xAxis": {
+                    "type": "value",
+                    "boundaryGap": [0, 0.01]
+                },
+                "yAxis": {
+                    "type": "category",
+                    "data": df_grouped['Kecamatan'].tolist()
+                },
+                "series": [
+                    {
+                        "name": "Suara 01",
+                        "type": "bar",
+                        "stack": "total",
+                        "label": {
+                            "show": True,
+                            "position": "inside",
+                            "formatter": "{c}"
+                        },
+                        "data": df_grouped['Suara 01'].astype(int).tolist(),
+                        "itemStyle": {
+                            "color": "#fac858"  # Warna untuk Suara 01
+                        }
+                    },
+                    {
+                        "name": "Suara 02",
+                        "type": "bar",
+                        "stack": "total",
+                        "label": {
+                            "show": True,
+                            "position": "inside",
+                            "formatter": "{c}"
+                        },
+                        "data": df_grouped['Suara 02'].astype(int).tolist(),
+                        "itemStyle": {
+                            "color": "#5470c6"  # Warna untuk Suara 02
+                        }
+                    }
+                ]
+            }
+
+            st_echarts(options=option_segmented_bar, height="600px")
+
+        # Chart 2: Total Perolehan Suara 01 dan Suara 02 dalam bentuk Pie Chart dengan gambar paslon
+        with col_chart2:
             st.subheader("Total Perolehan Suara Paslon")
             
+            # Menampilkan foto paslon di atas atau di samping pie chart
+            col_img1, col_img2 = st.columns([1, 1])
+            with col_img1:
+                st.image("ky.png", caption="Paslon 1", width=120)
+            with col_img2:
+                st.image("amboy.png", caption="Paslon 2", width=120)
+
+            # Konfigurasi pie chart
             option_pie_chart = {
                 "tooltip": {
                     "trigger": "item"
@@ -108,28 +197,8 @@ if response.status_code == 200:
                 ]
             }
 
+            # Menampilkan pie chart
             st_echarts(options=option_pie_chart, height="600px")
-
-        # Display images of candidates in adjacent columns with circular style
-        with col_image1:
-            st.markdown(
-                """
-                <div style="display: flex; align-items: center; justify-content: center;">
-                    <img src="ky.png" alt="Kandidat Suara 01" style="border-radius: 50%; width: 150px; height: 150px;">
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
-
-        with col_image2:
-            st.markdown(
-                """
-                <div style="display: flex; align-items: center; justify-content: center;">
-                    <img src="amboy.png" alt="Kandidat Suara 02" style="border-radius: 50%; width: 150px; height: 150px;">
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
 
     else:
         st.write("Tidak ada data yang ditemukan.")
