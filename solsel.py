@@ -159,8 +159,24 @@ if response.status_code == 200:
                         "type": "pie",
                         "radius": "50%",
                         "data": [
-                            {"value": total_suara_01, "name": "Suara 01", "itemStyle": {"color": "#fac858"}},
-                            {"value": total_suara_02, "name": "Suara 02", "itemStyle": {"color": "#5470c6"}}
+                            {
+                                "value": total_suara_01,
+                                "name": "Suara 01",
+                                "itemStyle": {"color": "#fac858"},
+                                "label": {
+                                    "show": True,
+                                    "formatter": "{b}: {c}"
+                                }
+                            },
+                            {
+                                "value": total_suara_02,
+                                "name": "Suara 02",
+                                "itemStyle": {"color": "#5470c6"},
+                                "label": {
+                                    "show": True,
+                                    "formatter": "{b}: {c}"
+                                }
+                            }
                         ],
                         "emphasis": {
                             "label": {
