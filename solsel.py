@@ -141,18 +141,10 @@ if response.status_code == 200:
 
             st_echarts(options=option_segmented_bar, height="600px")
 
-        # Chart 2: Total Perolehan Suara 01 dan Suara 02 dalam bentuk Pie Chart dengan gambar paslon
+        # Chart 2: Total Perolehan Suara 01 dan Suara 02 dalam bentuk Pie Chart
         with col_chart2:
             st.subheader("Total Perolehan Suara Paslon")
             
-            # Menampilkan foto paslon di atas atau di samping pie chart
-            col_img1, col_img2 = st.columns([1, 1])
-            with col_img1:
-                st.image("ky.png", caption="Paslon 1", width=120)
-            with col_img2:
-                st.image("amboy.png", caption="Paslon 2", width=120)
-
-            # Konfigurasi pie chart
             option_pie_chart = {
                 "tooltip": {
                     "trigger": "item"
@@ -167,24 +159,8 @@ if response.status_code == 200:
                         "type": "pie",
                         "radius": "50%",
                         "data": [
-                            {
-                                "value": total_suara_01,
-                                "name": "Suara 01",
-                                "itemStyle": {"color": "#fac858"},
-                                "label": {
-                                    "show": True,
-                                    "formatter": "{b}: {c}"
-                                }
-                            },
-                            {
-                                "value": total_suara_02,
-                                "name": "Suara 02",
-                                "itemStyle": {"color": "#5470c6"},
-                                "label": {
-                                    "show": True,
-                                    "formatter": "{b}: {c}"
-                                }
-                            }
+                            {"value": total_suara_01, "name": "Suara 01", "itemStyle": {"color": "#fac858"}},
+                            {"value": total_suara_02, "name": "Suara 02", "itemStyle": {"color": "#5470c6"}}
                         ],
                         "emphasis": {
                             "label": {
@@ -197,7 +173,6 @@ if response.status_code == 200:
                 ]
             }
 
-            # Menampilkan pie chart
             st_echarts(options=option_pie_chart, height="600px")
 
     else:
