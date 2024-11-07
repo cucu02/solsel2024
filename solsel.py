@@ -45,6 +45,7 @@ if response.status_code == 200:
         total_suara_02 = int(df_grouped['Suara 02'].sum())
         total_suara_tidak_sah = int(df['Suara Tidak Sah'].sum())
         total_tps = df['Nomor TPS'].notna().sum()
+        total_dpt = int(df['DPT'].sum())
 
         # Calculate unique count of Kecamatan
         unique_kecamatan_count = df['Kecamatan'].nunique()
