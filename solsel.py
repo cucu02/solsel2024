@@ -45,7 +45,7 @@ if response.status_code == 200:
         # Metrics Layout
         col1, col2, col3 = st.columns(3)
         with col1:
-            st.metric("Jumlah Kecamatan", len(df_grouped))
+           st.metric("Jumlah Kecamatan", unique_kecamatan_count)  # dynamically calculated
         with col2:
             st.metric("Jumlah Nagari", 39)
         with col3:
