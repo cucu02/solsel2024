@@ -3,6 +3,9 @@ import pandas as pd
 import requests
 from streamlit_echarts import st_echarts
 
+# Konfigurasi halaman harus diatur di bagian paling atas
+st.set_page_config(layout="wide", page_title="Quick Count Pilkada Solsel 2024", page_icon="🗳️")
+
 # ID dari Google Sheets dan API Key
 SHEET_ID = "11VpCK1BHH74-LOL6dMT8g4W28c_a9Ialf-Gu2CLAfSo"
 API_KEY = "AIzaSyD48O12Pwu9KE3o9Gl0YO1JM0hSUiwR3k8"  # Gantilah dengan API Key yang benar
@@ -36,8 +39,8 @@ if response.status_code == 200:
         df['Suara 01'] = pd.to_numeric(df['Suara 01'], errors='coerce').fillna(0)
         df['Suara 02'] = pd.to_numeric(df['Suara 02'], errors='coerce').fillna(0)
         df['Suara Tidak Sah'] = pd.to_numeric(df['Suara Tidak Sah'], errors='coerce').fillna(0)
-
-        # Periksa apakah kolom 'DPT' ada setelah standarisasi nama kolom
+        
+        # Memastikan kolom 'DPT' diakses dengan benar
         if 'DPT' in df.columns:
             df['DPT'] = pd.to_numeric(df['DPT'], errors='coerce').fillna(0)
         else:
@@ -63,14 +66,10 @@ if response.status_code == 200:
         unique_kecamatan_count = df['Kecamatan'].nunique()
         unique_nagari_count = df['Nagari'].nunique()
 
-        # Mulai dashboard
-        st.set_page_config(layout="wide", page_title="Quick Count Pilkada Solsel 2024", page_icon="🗳️")
-        st.title("Quick Count Pilkada Solsel 2024")
-
         # Metrics Layout
         col1, col2, col3 = st.columns(3)
         with col1:
-            st.metric("Jumlah Kecamatan", unique_kecamatan_count)  # dynamically calculated
+            st.metric("Jumlah Kecamatan", unique_kecamatan_count)
         with col2:
             st.metric("Jumlah Nagari", unique_nagari_count)
         with col3:
