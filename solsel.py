@@ -30,6 +30,7 @@ if response.status_code == 200:
         df['Suara 01'] = pd.to_numeric(df['Suara 01'], errors='coerce').fillna(0)
         df['Suara 02'] = pd.to_numeric(df['Suara 02'], errors='coerce').fillna(0)
         df['Suara Tidak Sah'] = pd.to_numeric(df['Suara Tidak Sah'], errors='coerce').fillna(0)
+        df['DPT'] = pd.to_numeric(df['DPT'], errors='coerce').fillna(0)  # Tambahkan konversi ini
 
         # Filter out any rows where 'Kecamatan' might contain unintended header or invalid data
         df = df[df['Kecamatan'] != 'Kecamatan']
@@ -47,7 +48,7 @@ if response.status_code == 200:
         total_tps = df['Nomor TPS'].notna().sum()
         total_dpt = int(df['DPT'].sum())
 
-        # Calculate unique count of Kecamatan
+        # Calculate unique count of Kecamatan and Nagari
         unique_kecamatan_count = df['Kecamatan'].nunique()
         unique_nagari_count = df['Nagari'].nunique()
 
