@@ -23,10 +23,17 @@ if response.status_code == 200:
         # Konversi data ke Pandas DataFrame
         df = pd.DataFrame(values[1:], columns=values[0])
         
+        # Standarisasi kolom 'Kecamatan' untuk menghindari duplikasi akibat spasi atau kapitalisasi
+        df['Kecamatan'] = df['Kecamatan'].str.strip().str.title()
+
         # Konversi kolom numerik
         df['Suara 01'] = pd.to_numeric(df['Suara 01'], errors='coerce').fillna(0)
         df['Suara 02'] = pd.to_numeric(df['Suara 02'], errors='coerce').fillna(0)
-        
+        df['Suara Tidak Sah'] = pd.to_numeric(df['Suara Tidak Sah'], errors='coerce').fillna(0)
+
+        # Filter out any rows where 'Kecamatan' might contain unintended header or invalid data
+        df = df[df['Kecamatan'] != 'Kecamatan']
+
         # Mengelompokkan data berdasarkan kecamatan dan menjumlahkan nilai suara
         df_grouped = df.groupby('Kecamatan', as_index=False).agg({
             'Suara 01': 'sum',
@@ -48,7 +55,7 @@ if response.status_code == 200:
         # Metrics Layout
         col1, col2, col3 = st.columns(3)
         with col1:
-           st.metric("Jumlah Kecamatan", unique_kecamatan_count)  # dynamically calculated
+            st.metric("Jumlah Kecamatan", unique_kecamatan_count)  # dynamically calculated
         with col2:
             st.metric("Jumlah Nagari", 39)
         with col3:
