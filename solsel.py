@@ -37,7 +37,10 @@ if response.status_code == 200:
         total_suara_01 = int(df_grouped['Suara 01'].sum())
         total_suara_02 = int(df_grouped['Suara 02'].sum())
         total_suara_tidak_sah = int(df['Suara Tidak Sah'].sum())
-        # Calculate unique count of Kecamatan
+        #Filter out any rows where 'Kecamatan' might contain unintended header or invalid data
+        df = df[df['Kecamatan'] != 'Kecamatan']
+
+        # Now calculate the unique count of Kecamatan
         unique_kecamatan_count = df['Kecamatan'].nunique()
 
         # Mulai dashboard
