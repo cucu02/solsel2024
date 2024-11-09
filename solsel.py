@@ -88,7 +88,7 @@ if response.status_code == 200:
 
         # Chart 1: Segmented Bar Chart untuk Perolehan Suara Paslon per Kecamatan
         with col_chart1:
-            st.subheader("Perolehan Suara Paslon per Kecamatan")
+            st.subheader("Perolehan Suara per Kecamatan")
             
             option_segmented_bar = {
                 "tooltip": {
@@ -143,7 +143,7 @@ if response.status_code == 200:
 
         # Chart 2: Total Perolehan Suara 01 dan Suara 02 dalam bentuk Pie Chart
         with col_chart2:
-            st.subheader("Total Perolehan Suara Paslon")
+            st.subheader("Total Perolehan Suara")
             
             option_pie_chart = {
                 "tooltip": {
