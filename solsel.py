@@ -10,7 +10,7 @@ st.title("Quick Count Pilkada Solsel 2024")
 # ID dari Google Sheets dan API Key
 SHEET_ID = "11VpCK1BHH74-LOL6dMT8g4W28c_a9Ialf-Gu2CLAfSo"
 API_KEY = "AIzaSyD48O12Pwu9KE3o9Gl0YO1JM0hSUiwR3k8"  # Gantilah dengan API Key yang benar
-RANGE = "Sheet3!A1:K1000"  # Sesuaikan jangkauan untuk menyertakan kolom K
+RANGE = "Sheet3!A1:N1000"  # Updated range to include up to column N
 
 # Membuat URL API untuk mengakses data dari Google Sheets
 url = f"https://sheets.googleapis.com/v4/spreadsheets/{SHEET_ID}/values/{RANGE}?key={API_KEY}"
@@ -37,20 +37,18 @@ if response.status_code == 200:
         df['Suara 01'] = pd.to_numeric(df['Suara 01'], errors='coerce').fillna(0)
         df['Suara 02'] = pd.to_numeric(df['Suara 02'], errors='coerce').fillna(0)
         df['Suara Tidak Sah'] = pd.to_numeric(df['Suara Tidak Sah'], errors='coerce').fillna(0)
+        df['DPT'] = pd.to_numeric(df['DPT'], errors='coerce').fillna(0)
+        df['Surat Suara + 2,5% dari DPT'] = pd.to_numeric(df['Surat Suara + 2,5% dari DPT'], errors='coerce').fillna(0)
         
-        # Memastikan kolom 'DPT' diakses dengan benar
-        if 'DPT' in df.columns:
-            df['DPT'] = pd.to_numeric(df['DPT'], errors='coerce').fillna(0)
-        else:
-            st.write("Kolom 'DPT' tidak ditemukan dalam data.")
-
         # Filter out any rows where 'Kecamatan' might contain unintended header or invalid data
         df = df[df['Kecamatan'] != 'Kecamatan']
 
         # Mengelompokkan data berdasarkan kecamatan dan menjumlahkan nilai suara
         df_grouped = df.groupby('Kecamatan', as_index=False).agg({
             'Suara 01': 'sum',
-            'Suara 02': 'sum'
+            'Suara 02': 'sum',
+            'Suara Tidak Sah': 'sum',
+            'DPT': 'sum'
         })
 
         # Hitung total perolehan Suara 01 dan Suara 02
