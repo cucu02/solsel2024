@@ -61,27 +61,31 @@ if response.status_code == 200:
             df_grouped = pd.merge(df_grouped, total_tps_per_kecamatan, on='Kecamatan', how='left')
             df_grouped = pd.merge(df_grouped, tps_masuk_per_kecamatan, on='Kecamatan', how='left').fillna(0)
 
-            # Hitung persentase TPS masuk
-            df_grouped['Persentase TPS'] = (df_grouped['TPS Masuk'] / df_grouped['Total TPS']) * 100
+            # Hitung persentase TPS masuk dengan pembulatan
+            df_grouped['Persentase TPS'] = ((df_grouped['TPS Masuk'] / df_grouped['Total TPS']) * 100).round(2)
 
-            # Hitung total perolehan Suara 01 dan Suara 02
+            # Hitung total perolehan Suara 01, Suara 02, dan DPT
             total_suara_01 = int(df_grouped['Suara 01'].sum())
             total_suara_02 = int(df_grouped['Suara 02'].sum())
-            total_dpt = int(df['DPT'].sum()) if 'DPT' in df.columns else 0
+            total_dpt = int(df_grouped['DPT'].sum())
+            total_tps = int(total_tps_per_kecamatan['Total TPS'].sum())
+            total_tps_masuk = int(tps_masuk_per_kecamatan['TPS Masuk'].sum())
 
             # Metrics Layout
-            col1, col2, col3 = st.columns(3)
+            col1, col2, col3, col4 = st.columns(4)
             with col1:
                 st.metric("Jumlah Kecamatan", df['Kecamatan'].nunique())
             with col2:
-                st.metric("Total TPS", int(total_tps_per_kecamatan['Total TPS'].sum()))
+                st.metric("Total DPT", total_dpt)
             with col3:
-                st.metric("Jumlah TPS yang sudah masuk", int(tps_masuk_per_kecamatan['TPS Masuk'].sum()))
-
-            col4, col5 = st.columns(2)
+                st.metric("Total TPS", total_tps)
             with col4:
-                st.metric("Total Perolehan Suara 01", total_suara_01)
+                st.metric("TPS yang Masuk", total_tps_masuk)
+
+            col5, col6 = st.columns(2)
             with col5:
+                st.metric("Total Perolehan Suara 01", total_suara_01)
+            with col6:
                 st.metric("Total Perolehan Suara 02", total_suara_02)
 
             # Layout untuk menampilkan dua chart berdampingan
