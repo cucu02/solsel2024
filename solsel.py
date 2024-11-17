@@ -30,9 +30,6 @@ if response.status_code == 200:
         # Menghilangkan spasi tambahan pada nama kolom
         df.columns = df.columns.str.strip()
 
-        # Tampilkan nama kolom untuk debugging
-        #st.write("Kolom yang ditemukan:", df.columns.tolist())
-
         # Validasi keberadaan kolom yang diharapkan
         required_columns = ['Kecamatan', 'Suara 01', 'Suara 02', 'Suara Tidak Sah', 'DPT', 'Suara Sah']
         missing_columns = [col for col in required_columns if col not in df.columns]
@@ -50,86 +47,96 @@ if response.status_code == 200:
             df['DPT'] = pd.to_numeric(df['DPT'], errors='coerce').fillna(0)
             df['Suara Sah'] = pd.to_numeric(df['Suara Sah'], errors='coerce').fillna(0)
 
-            # Periksa dan proses kolom opsional 'Surat Suara + 2,5% dari DPT'
-            if 'Surat Suara + 2,5% dari DPT' in df.columns:
-                df['Surat Suara + 2,5% dari DPT'] = pd.to_numeric(df['Surat Suara + 2,5% dari DPT'], errors='coerce').fillna(0)
-            else:
-                st.warning("Kolom 'Surat Suara + 2,5% dari DPT' tidak ditemukan. Pastikan data Google Sheets memiliki kolom tersebut.")
+            # Hitung total TPS dan jumlah TPS yang sudah masuk
+            total_tps_per_kecamatan = df.groupby('Kecamatan').size().reset_index(name='Total TPS')
+            tps_masuk_per_kecamatan = df[df['Suara Sah'] > 0].groupby('Kecamatan').size().reset_index(name='TPS Masuk')
 
-            # Hitung total TPS
-            total_tps = df.shape[0]
-
-            # Hitung jumlah TPS yang sudah masuk berdasarkan 'Suara Sah' > 0
-            jumlah_tps_masuk = df[df['Suara Sah'] > 0].shape[0]
-
-            # Filter out invalid rows
-            df = df[df['Kecamatan'] != 'Kecamatan']
-
-            # Mengelompokkan data berdasarkan kecamatan dan menjumlahkan nilai suara
+            # Gabungkan ke DataFrame utama
             df_grouped = df.groupby('Kecamatan', as_index=False).agg({
                 'Suara 01': 'sum',
                 'Suara 02': 'sum',
                 'Suara Tidak Sah': 'sum',
                 'DPT': 'sum'
             })
+            df_grouped = pd.merge(df_grouped, total_tps_per_kecamatan, on='Kecamatan', how='left')
+            df_grouped = pd.merge(df_grouped, tps_masuk_per_kecamatan, on='Kecamatan', how='left').fillna(0)
+
+            # Hitung persentase TPS masuk
+            df_grouped['Persentase TPS'] = (df_grouped['TPS Masuk'] / df_grouped['Total TPS']) * 100
 
             # Hitung total perolehan Suara 01 dan Suara 02
             total_suara_01 = int(df_grouped['Suara 01'].sum())
             total_suara_02 = int(df_grouped['Suara 02'].sum())
             total_dpt = int(df['DPT'].sum()) if 'DPT' in df.columns else 0
 
-            # Calculate unique count of Kecamatan and Nagari
-            unique_kecamatan_count = df['Kecamatan'].nunique()
-            unique_nagari_count = df['Nagari'].nunique() if 'Nagari' in df.columns else 0
-
             # Metrics Layout
             col1, col2, col3 = st.columns(3)
             with col1:
-                st.metric("Jumlah Kecamatan", unique_kecamatan_count)
+                st.metric("Jumlah Kecamatan", df['Kecamatan'].nunique())
             with col2:
-                st.metric("Jumlah Nagari", unique_nagari_count)
+                st.metric("Total TPS", int(total_tps_per_kecamatan['Total TPS'].sum()))
             with col3:
-                st.metric("Total TPS", total_tps)
+                st.metric("Jumlah TPS yang sudah masuk", int(tps_masuk_per_kecamatan['TPS Masuk'].sum()))
 
-            col4, col5, col6, col7 = st.columns(4)
+            col4, col5 = st.columns(2)
             with col4:
-                st.metric("Jumlah DPT", total_dpt)
-            with col5:
-                st.metric("Jumlah TPS yang sudah masuk", jumlah_tps_masuk)
-            with col6:
                 st.metric("Total Perolehan Suara 01", total_suara_01)
-            with col7:
+            with col5:
                 st.metric("Total Perolehan Suara 02", total_suara_02)
 
-            # Layout untuk menampilkan dua chart berdampingan
-            col_chart1, col_chart2 = st.columns(2)
-
-            # Chart 1: Segmented Bar Chart untuk Perolehan Suara Paslon per Kecamatan
-            with col_chart1:
-                st.subheader("Perolehan Suara per Kecamatan")
+            # Chart 1: Segmented Bar Chart untuk Perolehan Suara dan Persentase TPS
+            with st.container():
+                st.subheader("Perolehan Suara dan Persentase TPS per Kecamatan")
                 option_segmented_bar = {
                     "tooltip": {"trigger": "axis", "axisPointer": {"type": "shadow"}},
-                    "legend": {"data": ["Suara 01", "Suara 02"], "top": "5%"},
+                    "legend": {"data": ["Suara 01", "Suara 02", "Persentase TPS (%)"], "top": "5%"},
                     "xAxis": {"type": "value", "boundaryGap": [0, 0.01]},
                     "yAxis": {"type": "category", "data": df_grouped['Kecamatan'].tolist()},
                     "series": [
-                        {"name": "Suara 01", "type": "bar", "stack": "total", "label": {"show": True, "position": "inside", "formatter": "{c}"}, "data": df_grouped['Suara 01'].tolist(), "itemStyle": {"color": "#fac858"}},
-                        {"name": "Suara 02", "type": "bar", "stack": "total", "label": {"show": True, "position": "inside", "formatter": "{c}"}, "data": df_grouped['Suara 02'].tolist(), "itemStyle": {"color": "#5470c6"}}
+                        {
+                            "name": "Suara 01",
+                            "type": "bar",
+                            "stack": "total",
+                            "label": {"show": True, "position": "inside", "formatter": "{c}"},
+                            "data": df_grouped['Suara 01'].tolist(),
+                            "itemStyle": {"color": "#fac858"}
+                        },
+                        {
+                            "name": "Suara 02",
+                            "type": "bar",
+                            "stack": "total",
+                            "label": {"show": True, "position": "inside", "formatter": "{c}"},
+                            "data": df_grouped['Suara 02'].tolist(),
+                            "itemStyle": {"color": "#5470c6"}
+                        },
+                        {
+                            "name": "Persentase TPS (%)",
+                            "type": "bar",
+                            "stack": None,  # Tidak ditumpuk
+                            "label": {"show": True, "position": "right", "formatter": "{c}%"},
+                            "data": df_grouped['Persentase TPS'].tolist(),
+                            "itemStyle": {"color": "#91cc75"}  # Warna hijau untuk persentase TPS
+                        }
                     ]
                 }
                 st_echarts(options=option_segmented_bar, height="600px")
 
             # Chart 2: Total Perolehan Suara 01 dan Suara 02 dalam bentuk Pie Chart
-            with col_chart2:
+            with st.container():
                 st.subheader("Total Perolehan Suara")
                 option_pie_chart = {
                     "tooltip": {"trigger": "item"},
                     "legend": {"top": "5%", "left": "center"},
                     "series": [
-                        {"name": "Total Perolehan Suara", "type": "pie", "radius": "50%", "data": [
-                            {"value": total_suara_01, "name": "Suara 01", "itemStyle": {"color": "#fac858"}},
-                            {"value": total_suara_02, "name": "Suara 02", "itemStyle": {"color": "#5470c6"}}
-                        ]}
+                        {
+                            "name": "Total Perolehan Suara",
+                            "type": "pie",
+                            "radius": "50%",
+                            "data": [
+                                {"value": total_suara_01, "name": "Suara 01", "itemStyle": {"color": "#fac858"}},
+                                {"value": total_suara_02, "name": "Suara 02", "itemStyle": {"color": "#5470c6"}}
+                            ]
+                        }
                     ]
                 }
                 st_echarts(options=option_pie_chart, height="600px")
