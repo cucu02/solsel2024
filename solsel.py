@@ -56,15 +56,8 @@ if response.status_code == 200:
             else:
                 st.warning("Kolom 'Surat Suara + 2,5% dari DPT' tidak ditemukan. Pastikan data Google Sheets memiliki kolom tersebut.")
 
-            # Hitung total DPT
-            total_dpt = int(df['DPT'].sum()) if 'DPT' in df.columns else 0
-
-            # Hitung jumlah TPS yang sudah mengirimkan data (Suara Sah > 0)
+            # Hitung jumlah TPS yang sudah masuk berdasarkan 'Suara Sah' > 0
             jumlah_tps_masuk = df[df['Suara Sah'] > 0].shape[0]
-
-            # Hitung total suara 01 dan 02
-            total_suara_01 = int(df['Suara 01'].sum())
-            total_suara_02 = int(df['Suara 02'].sum())
 
             # Filter out invalid rows
             df = df[df['Kecamatan'] != 'Kecamatan']
@@ -77,6 +70,11 @@ if response.status_code == 200:
                 'DPT': 'sum'
             })
 
+            # Hitung total perolehan Suara 01 dan Suara 02
+            total_suara_01 = int(df_grouped['Suara 01'].sum())
+            total_suara_02 = int(df_grouped['Suara 02'].sum())
+            total_dpt = int(df['DPT'].sum()) if 'DPT' in df.columns else 0
+
             # Calculate unique count of Kecamatan and Nagari
             unique_kecamatan_count = df['Kecamatan'].nunique()
             unique_nagari_count = df['Nagari'].nunique() if 'Nagari' in df.columns else 0
@@ -88,18 +86,17 @@ if response.status_code == 200:
             with col2:
                 st.metric("Jumlah Nagari", unique_nagari_count)
             with col3:
-                st.metric("Total TPS", df.shape[0])
+                st.metric("Jumlah TPS yang sudah masuk", jumlah_tps_masuk)
 
-            # Barisan metrik Total DPT, TPS Masuk, Suara 01, Suara 02
             col4, col5, col6, col7 = st.columns(4)
             with col4:
-                st.metric("Total DPT", total_dpt)
+                st.metric("Jumlah DPT", total_dpt)
             with col5:
-                st.metric("TPS yang Sudah Mengirimkan Data", jumlah_tps_masuk)
+                st.metric("Jumlah TPS yang sudah masuk", jumlah_tps_masuk)
             with col6:
-                st.metric("Total Suara 01", total_suara_01)
+                st.metric("Total Perolehan Suara 01", total_suara_01)
             with col7:
-                st.metric("Total Suara 02", total_suara_02)
+                st.metric("Total Perolehan Suara 02", total_suara_02)
 
             # Layout untuk menampilkan dua chart berdampingan
             col_chart1, col_chart2 = st.columns(2)
