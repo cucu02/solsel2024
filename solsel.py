@@ -31,10 +31,10 @@ if response.status_code == 200:
         df.columns = df.columns.str.strip()
 
         # Tampilkan nama kolom untuk debugging
-        #st.write("Kolom yang ditemukan:", df.columns.tolist())
+        st.write("Kolom yang ditemukan:", df.columns.tolist())
 
         # Validasi keberadaan kolom yang diharapkan
-        required_columns = ['Kecamatan', 'Suara 01', 'Suara 02', 'Suara Tidak Sah', 'DPT']
+        required_columns = ['Kecamatan', 'Suara 01', 'Suara 02', 'Suara Tidak Sah', 'DPT', 'Suara Sah']
         missing_columns = [col for col in required_columns if col not in df.columns]
 
         if missing_columns:
@@ -48,12 +48,16 @@ if response.status_code == 200:
             df['Suara 02'] = pd.to_numeric(df['Suara 02'], errors='coerce').fillna(0)
             df['Suara Tidak Sah'] = pd.to_numeric(df['Suara Tidak Sah'], errors='coerce').fillna(0)
             df['DPT'] = pd.to_numeric(df['DPT'], errors='coerce').fillna(0)
+            df['Suara Sah'] = pd.to_numeric(df['Suara Sah'], errors='coerce').fillna(0)
 
             # Periksa dan proses kolom opsional 'Surat Suara + 2,5% dari DPT'
             if 'Surat Suara + 2,5% dari DPT' in df.columns:
                 df['Surat Suara + 2,5% dari DPT'] = pd.to_numeric(df['Surat Suara + 2,5% dari DPT'], errors='coerce').fillna(0)
             else:
                 st.warning("Kolom 'Surat Suara + 2,5% dari DPT' tidak ditemukan. Pastikan data Google Sheets memiliki kolom tersebut.")
+
+            # Hitung jumlah TPS yang sudah masuk berdasarkan 'Suara Sah' > 0
+            jumlah_tps_masuk = df[df['Suara Sah'] > 0].shape[0]
 
             # Filter out invalid rows
             df = df[df['Kecamatan'] != 'Kecamatan']
@@ -69,8 +73,6 @@ if response.status_code == 200:
             # Hitung total perolehan Suara 01 dan Suara 02
             total_suara_01 = int(df_grouped['Suara 01'].sum())
             total_suara_02 = int(df_grouped['Suara 02'].sum())
-            total_suara_tidak_sah = int(df['Suara Tidak Sah'].sum())
-            total_tps = df['Kecamatan'].notna().sum()
             total_dpt = int(df['DPT'].sum()) if 'DPT' in df.columns else 0
 
             # Calculate unique count of Kecamatan and Nagari
@@ -84,13 +86,13 @@ if response.status_code == 200:
             with col2:
                 st.metric("Jumlah Nagari", unique_nagari_count)
             with col3:
-                st.metric("Jumlah TPS", total_tps)
+                st.metric("Jumlah TPS yang sudah masuk", jumlah_tps_masuk)
 
             col4, col5, col6, col7 = st.columns(4)
             with col4:
                 st.metric("Jumlah DPT", total_dpt)
             with col5:
-                st.metric("Total Jumlah Suara Tidak Sah", total_suara_tidak_sah)
+                st.metric("Jumlah TPS yang sudah masuk", jumlah_tps_masuk)
             with col6:
                 st.metric("Total Perolehan Suara 01", total_suara_01)
             with col7:
