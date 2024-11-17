@@ -97,23 +97,24 @@ if response.status_code == 200:
             }
             st_echarts(options=option_stacked_bar, height="700px")
 
-            # Chart 2: Bar Chart untuk Persentase TPS Masuk
-            st.subheader("Persentase TPS yang Sudah Masuk per Kecamatan")
-            option_percentage_bar = {
-                "tooltip": {"trigger": "axis", "axisPointer": {"type": "shadow"}},
-                "xAxis": {"type": "value", "boundaryGap": [0, 0.01]},
-                "yAxis": {"type": "category", "data": df_grouped['kecamatan'].tolist()},
+            # Chart 2: Pie Chart untuk Total Perolehan Suara
+            st.subheader("Total Perolehan Suara")
+            option_pie_chart = {
+                "tooltip": {"trigger": "item"},
+                "legend": {"top": "5%", "left": "center"},
                 "series": [
                     {
-                        "name": "Persentase TPS",
-                        "type": "bar",
-                        "label": {"show": True, "position": "inside", "formatter": "{c}%"},
-                        "data": df_grouped['persentase_tps'].tolist(),
-                        "itemStyle": {"color": "#91cc75"}
+                        "name": "Total Perolehan Suara",
+                        "type": "pie",
+                        "radius": "50%",
+                        "data": [
+                            {"value": total_suara_01, "name": "Suara 01", "itemStyle": {"color": "#fac858"}},
+                            {"value": total_suara_02, "name": "Suara 02", "itemStyle": {"color": "#5470c6"}}
+                        ]
                     }
                 ]
             }
-            st_echarts(options=option_percentage_bar, height="700px")
+            st_echarts(options=option_pie_chart, height="600px")
     else:
         st.write("Tidak ada data yang ditemukan.")
 else:
