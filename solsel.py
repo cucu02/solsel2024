@@ -3,13 +3,16 @@ import pandas as pd
 import requests
 from streamlit_echarts import st_echarts
 
+# Konfigurasi halaman harus diatur di bagian paling atas
 st.set_page_config(layout="wide", page_title="Quick Count Pilkada Solsel 2024", page_icon="🗳️")
 st.title("Quick Count Pilkada Solsel 2024")
 
+# ID dari Google Sheets dan API Key
 SHEET_ID = "11VpCK1BHH74-LOL6dMT8g4W28c_a9Ialf-Gu2CLAfSo"
 API_KEY = "AIzaSyD48O12Pwu9KE3o9Gl0YO1JM0hSUiwR3k8"
 RANGE = "Sheet3!A1:Z1000"
 
+# Membuat URL API untuk mengakses data dari Google Sheets
 url = f"https://sheets.googleapis.com/v4/spreadsheets/{SHEET_ID}/values/{RANGE}?key={API_KEY}"
 response = requests.get(url)
 
@@ -74,8 +77,30 @@ if response.status_code == 200:
                     "xAxis": {"type": "value", "boundaryGap": [0, 0.01]},
                     "yAxis": {"type": "category", "data": df_grouped['kecamatan'].tolist()},
                     "series": [
-                        {"name": "Suara 01", "type": "bar", "stack": "total", "data": df_grouped['suara_01'].tolist()},
-                        {"name": "Suara 02", "type": "bar", "stack": "total", "data": df_grouped['suara_02'].tolist()}
+                        {
+                            "name": "Suara 01",
+                            "type": "bar",
+                            "stack": "total",
+                            "label": {
+                                "show": True,
+                                "position": "inside",
+                                "formatter": "{c}"  # Menampilkan nilai
+                            },
+                            "data": df_grouped['suara_01'].tolist(),
+                            "itemStyle": {"color": "#fac858"}  # Warna Suara 01
+                        },
+                        {
+                            "name": "Suara 02",
+                            "type": "bar",
+                            "stack": "total",
+                            "label": {
+                                "show": True,
+                                "position": "inside",
+                                "formatter": "{c}"  # Menampilkan nilai
+                            },
+                            "data": df_grouped['suara_02'].tolist(),
+                            "itemStyle": {"color": "#5470c6"}  # Warna Suara 02
+                        }
                     ]
                 }
                 st_echarts(options=option_segmented_bar, height="600px")
@@ -86,10 +111,15 @@ if response.status_code == 200:
                     "tooltip": {"trigger": "item"},
                     "legend": {"top": "5%", "left": "center"},
                     "series": [
-                        {"name": "Total Perolehan Suara", "type": "pie", "radius": "50%", "data": [
-                            {"value": total_suara_01, "name": "Suara 01"},
-                            {"value": total_suara_02, "name": "Suara 02"}
-                        ]}
+                        {
+                            "name": "Total Perolehan Suara",
+                            "type": "pie",
+                            "radius": "50%",
+                            "data": [
+                                {"value": total_suara_01, "name": "Suara 01", "itemStyle": {"color": "#fac858"}},
+                                {"value": total_suara_02, "name": "Suara 02", "itemStyle": {"color": "#5470c6"}}
+                            ]
+                        }
                     ]
                 }
                 st_echarts(options=option_pie_chart, height="600px")
