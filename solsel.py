@@ -84,8 +84,11 @@ if response.status_code == 200:
             with col5:
                 st.metric("Total Perolehan Suara 02", total_suara_02)
 
+            # Layout untuk menampilkan dua chart berdampingan
+            col_chart1, col_chart2 = st.columns(2)
+
             # Chart 1: Segmented Bar Chart untuk Perolehan Suara dan Persentase TPS
-            with st.container():
+            with col_chart1:
                 st.subheader("Perolehan Suara dan Persentase TPS per Kecamatan")
                 option_segmented_bar = {
                     "tooltip": {"trigger": "axis", "axisPointer": {"type": "shadow"}},
@@ -122,7 +125,7 @@ if response.status_code == 200:
                 st_echarts(options=option_segmented_bar, height="600px")
 
             # Chart 2: Total Perolehan Suara 01 dan Suara 02 dalam bentuk Pie Chart
-            with st.container():
+            with col_chart2:
                 st.subheader("Total Perolehan Suara")
                 option_pie_chart = {
                     "tooltip": {"trigger": "item"},
