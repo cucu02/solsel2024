@@ -85,17 +85,14 @@ if response.status_code == 200:
             # Layout untuk menampilkan dua chart berdampingan
             col_chart1, col_chart2 = st.columns(2)
 
-            # Chart 1: Dual Bar Chart (Perolehan Suara dan Persentase TPS Masuk)
+            # Chart 1: Bar Chart (Perolehan Suara dengan Persentase TPS Masuk sebagai Label)
             with col_chart1:
-                st.subheader("Perolehan Suara dan Persentase TPS Masuk per Kecamatan")
+                st.subheader("Perolehan Suara per Kecamatan dengan Persentase TPS Masuk")
 
-                option_dual_bar = {
+                option_bar_with_percentage = {
                     "tooltip": {"trigger": "axis", "axisPointer": {"type": "shadow"}},
-                    "legend": {"data": ["Suara 01", "Suara 02", "Persentase TPS Masuk"], "top": "5%"},
-                    "xAxis": [
-                        {"type": "value", "boundaryGap": [0, 0.01]},
-                        {"type": "value", "max": 100, "boundaryGap": [0, 0.01]}  # Skala persentase
-                    ],
+                    "legend": {"data": ["Suara 01", "Suara 02"], "top": "5%"},
+                    "xAxis": {"type": "value", "boundaryGap": [0, 0.01]},
                     "yAxis": {
                         "type": "category",
                         "data": df_grouped['Kecamatan'].tolist()
@@ -108,7 +105,7 @@ if response.status_code == 200:
                             "label": {
                                 "show": True,
                                 "position": "inside",
-                                "formatter": "{c}"
+                                "formatter": lambda params: f"{params['value']} ({df_grouped.loc[params['dataIndex'], 'Persentase TPS Masuk']}%)"
                             },
                             "data": df_grouped['Suara 01'].tolist(),
                             "itemStyle": {"color": "#fac858"}
@@ -120,27 +117,15 @@ if response.status_code == 200:
                             "label": {
                                 "show": True,
                                 "position": "inside",
-                                "formatter": "{c}"
+                                "formatter": lambda params: f"{params['value']} ({df_grouped.loc[params['dataIndex'], 'Persentase TPS Masuk']}%)"
                             },
                             "data": df_grouped['Suara 02'].tolist(),
                             "itemStyle": {"color": "#5470c6"}
-                        },
-                        {
-                            "name": "Persentase TPS Masuk",
-                            "type": "bar",
-                            "xAxisIndex": 1,
-                            "label": {
-                                "show": True,
-                                "position": "outside",
-                                "formatter": "{c}%"
-                            },
-                            "data": df_grouped['Persentase TPS Masuk'].tolist(),
-                            "itemStyle": {"color": "#91cc75"}
                         }
                     ]
                 }
 
-                st_echarts(options=option_dual_bar, height="600px")
+                st_echarts(options=option_bar_with_percentage, height="600px")
 
             # Chart 2: Pie Chart Total Perolehan Suara
             with col_chart2:
