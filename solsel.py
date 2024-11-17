@@ -23,45 +23,43 @@ if response.status_code == 200:
         df = pd.DataFrame(values[1:], columns=values[0])
         df.columns = df.columns.str.strip().str.replace(" ", "_").str.lower()
 
-        required_columns = ['kecamatan', 'suara_01', 'suara_02', 'suara_tidak_sah', 'dpt', 'suara_sah']
+        required_columns = ['kecamatan', 'suara_01', 'suara_02', 'suara_tidak_sah', 'dpt', 'suara_sah', 'tps_terdaftar']
         missing_columns = [col for col in required_columns if col not in df.columns]
         if missing_columns:
             st.error(f"Kolom berikut tidak ditemukan: {', '.join(missing_columns)}")
         else:
             df['kecamatan'] = df['kecamatan'].str.strip().str.title()
-            for col in ['suara_01', 'suara_02', 'suara_tidak_sah', 'dpt', 'suara_sah']:
+            for col in ['suara_01', 'suara_02', 'suara_tidak_sah', 'dpt', 'suara_sah', 'tps_terdaftar']:
                 df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0)
 
-            # Hitung total TPS dan jumlah TPS yang sudah masuk
-            total_tps_per_kecamatan = df.groupby('kecamatan').size().reset_index(name='total_tps')
-            tps_masuk_per_kecamatan = df[df['suara_sah'] > 0].groupby('kecamatan').size().reset_index(name='tps_masuk')
+            # Hitung persentase TPS yang sudah masuk berdasarkan 'Suara Sah' > 0
+            df['tps_masuk'] = (df['suara_sah'] > 0).astype(int)
+            tps_persen = df.groupby('kecamatan', as_index=False).agg({
+                'tps_masuk': 'sum',
+                'tps_terdaftar': 'sum'
+            })
+            tps_persen['persentase_tps'] = (tps_persen['tps_masuk'] / tps_persen['tps_terdaftar']) * 100
 
-            # Gabungkan ke dataframe utama
             df_grouped = df.groupby('kecamatan', as_index=False).agg({
                 'suara_01': 'sum',
                 'suara_02': 'sum',
                 'suara_tidak_sah': 'sum',
                 'dpt': 'sum'
             })
-            df_grouped = pd.merge(df_grouped, total_tps_per_kecamatan, on='kecamatan', how='left')
-            df_grouped = pd.merge(df_grouped, tps_masuk_per_kecamatan, on='kecamatan', how='left').fillna(0)
 
-            # Hitung persentase TPS masuk
-            df_grouped['persentase_tps'] = (df_grouped['tps_masuk'] / df_grouped['total_tps']) * 100
+            df_grouped = pd.merge(df_grouped, tps_persen[['kecamatan', 'persentase_tps']], on='kecamatan', how='left')
 
-            # Total suara
             total_suara_01 = int(df_grouped['suara_01'].sum())
             total_suara_02 = int(df_grouped['suara_02'].sum())
             total_dpt = int(df['dpt'].sum())
 
-            # Display Metrics
             col1, col2, col3 = st.columns(3)
             with col1:
                 st.metric("Jumlah Kecamatan", df['kecamatan'].nunique())
             with col2:
-                st.metric("Total TPS", int(total_tps_per_kecamatan['total_tps'].sum()))
+                st.metric("Total TPS", int(df['tps_terdaftar'].sum()))
             with col3:
-                st.metric("Jumlah TPS yang sudah masuk", int(tps_masuk_per_kecamatan['tps_masuk'].sum()))
+                st.metric("Jumlah TPS yang sudah masuk", int(df['tps_masuk'].sum()))
 
             col4, col5 = st.columns(2)
             with col4:
@@ -97,24 +95,23 @@ if response.status_code == 200:
             }
             st_echarts(options=option_stacked_bar, height="700px")
 
-            # Chart 2: Pie Chart untuk Total Perolehan Suara
-            st.subheader("Total Perolehan Suara")
-            option_pie_chart = {
-                "tooltip": {"trigger": "item"},
-                "legend": {"top": "5%", "left": "center"},
+            # Chart 2: Bar Chart untuk Persentase TPS Masuk
+            st.subheader("Persentase TPS yang Sudah Masuk per Kecamatan")
+            option_percentage_bar = {
+                "tooltip": {"trigger": "axis", "axisPointer": {"type": "shadow"}},
+                "xAxis": {"type": "value", "boundaryGap": [0, 0.01]},
+                "yAxis": {"type": "category", "data": df_grouped['kecamatan'].tolist()},
                 "series": [
                     {
-                        "name": "Total Perolehan Suara",
-                        "type": "pie",
-                        "radius": "50%",
-                        "data": [
-                            {"value": total_suara_01, "name": "Suara 01", "itemStyle": {"color": "#fac858"}},
-                            {"value": total_suara_02, "name": "Suara 02", "itemStyle": {"color": "#5470c6"}}
-                        ]
+                        "name": "Persentase TPS",
+                        "type": "bar",
+                        "label": {"show": True, "position": "inside", "formatter": "{c}%"},
+                        "data": df_grouped['persentase_tps'].tolist(),
+                        "itemStyle": {"color": "#91cc75"}
                     }
                 ]
             }
-            st_echarts(options=option_pie_chart, height="600px")
+            st_echarts(options=option_percentage_bar, height="700px")
     else:
         st.write("Tidak ada data yang ditemukan.")
 else:
