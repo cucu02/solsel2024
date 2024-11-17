@@ -70,8 +70,15 @@ if response.status_code == 200:
             total_dpt = int(df_grouped['DPT'].sum())
             total_tps = int(total_tps_per_kecamatan['Total TPS'].sum())
             total_tps_masuk = int(tps_masuk_per_kecamatan['TPS Masuk'].sum())
+
+            # Hitung jumlah kecamatan
             jumlah_kecamatan = df['Kecamatan'].nunique()
-            jumlah_nagari = df['Kecamatan'].nunique()  # Sesuaikan jika ada kolom Nagari
+
+            # Hitung jumlah nagari
+            if 'Nagari' in df.columns:  # Periksa apakah kolom Nagari ada
+                jumlah_nagari = df['Nagari'].nunique()
+            else:
+                jumlah_nagari = jumlah_kecamatan  # Default: gunakan kecamatan sebagai proxy
 
             # Layout Metrics: Baris Pertama
             col1, col2, col3 = st.columns(3)
@@ -98,7 +105,7 @@ if response.status_code == 200:
 
             # Chart 1: Segmented Bar Chart untuk Perolehan Suara dan Persentase TPS
             with col_chart1:
-                st.subheader("Perolehan Suara per Kecamatan")
+                st.subheader("Perolehan Suara dan Persentase TPS per Kecamatan")
                 option_segmented_bar = {
                     "tooltip": {"trigger": "axis", "axisPointer": {"type": "shadow"}},
                     "legend": {"data": ["Suara 01", "Suara 02", "Persentase TPS (%)"], "top": "5%"},
@@ -131,7 +138,7 @@ if response.status_code == 200:
                         }
                     ]
                 }
-                st_echarts(options=option_segmented_bar, height="700px")
+                st_echarts(options=option_segmented_bar, height="600px")
 
             # Chart 2: Total Perolehan Suara 01 dan Suara 02 dalam bentuk Pie Chart
             with col_chart2:
