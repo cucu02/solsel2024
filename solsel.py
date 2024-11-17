@@ -70,22 +70,27 @@ if response.status_code == 200:
             total_dpt = int(df_grouped['DPT'].sum())
             total_tps = int(total_tps_per_kecamatan['Total TPS'].sum())
             total_tps_masuk = int(tps_masuk_per_kecamatan['TPS Masuk'].sum())
+            jumlah_kecamatan = df['Kecamatan'].nunique()
+            jumlah_nagari = df['Kecamatan'].nunique()  # Sesuaikan jika ada kolom Nagari
 
-            # Metrics Layout
-            col1, col2, col3, col4 = st.columns(4)
+            # Layout Metrics: Baris Pertama
+            col1, col2, col3 = st.columns(3)
             with col1:
-                st.metric("Jumlah Kecamatan", df['Kecamatan'].nunique())
+                st.metric("Jumlah Kecamatan", jumlah_kecamatan)
             with col2:
-                st.metric("Total DPT", total_dpt)
+                st.metric("Jumlah Nagari", jumlah_nagari)
             with col3:
                 st.metric("Total TPS", total_tps)
-            with col4:
-                st.metric("TPS yang Masuk", total_tps_masuk)
 
-            col5, col6 = st.columns(2)
+            # Layout Metrics: Baris Kedua
+            col4, col5, col6, col7 = st.columns(4)
+            with col4:
+                st.metric("Total DPT", total_dpt)
             with col5:
-                st.metric("Total Perolehan Suara 01", total_suara_01)
+                st.metric("TPS yang Masuk", total_tps_masuk)
             with col6:
+                st.metric("Total Perolehan Suara 01", total_suara_01)
+            with col7:
                 st.metric("Total Perolehan Suara 02", total_suara_02)
 
             # Layout untuk menampilkan dua chart berdampingan
@@ -93,7 +98,7 @@ if response.status_code == 200:
 
             # Chart 1: Segmented Bar Chart untuk Perolehan Suara dan Persentase TPS
             with col_chart1:
-                st.subheader("Perolehan Suara dan Persentase TPS per Kecamatan")
+                st.subheader("Perolehan Suara per Kecamatan")
                 option_segmented_bar = {
                     "tooltip": {"trigger": "axis", "axisPointer": {"type": "shadow"}},
                     "legend": {"data": ["Suara 01", "Suara 02", "Persentase TPS (%)"], "top": "5%"},
@@ -126,7 +131,7 @@ if response.status_code == 200:
                         }
                     ]
                 }
-                st_echarts(options=option_segmented_bar, height="600px")
+                st_echarts(options=option_segmented_bar, height="700px")
 
             # Chart 2: Total Perolehan Suara 01 dan Suara 02 dalam bentuk Pie Chart
             with col_chart2:
