@@ -56,6 +56,9 @@ if response.status_code == 200:
             else:
                 st.warning("Kolom 'Surat Suara + 2,5% dari DPT' tidak ditemukan. Pastikan data Google Sheets memiliki kolom tersebut.")
 
+            # Hitung total TPS
+            total_tps = df.shape[0]
+
             # Hitung jumlah TPS yang sudah masuk berdasarkan 'Suara Sah' > 0
             jumlah_tps_masuk = df[df['Suara Sah'] > 0].shape[0]
 
@@ -86,7 +89,7 @@ if response.status_code == 200:
             with col2:
                 st.metric("Jumlah Nagari", unique_nagari_count)
             with col3:
-                st.metric("Jumlah TPS yang sudah masuk", jumlah_tps_masuk)
+                st.metric("Total TPS", total_tps)
 
             col4, col5, col6, col7 = st.columns(4)
             with col4:
