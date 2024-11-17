@@ -82,61 +82,94 @@ if response.status_code == 200:
             with col5:
                 st.metric("Total Perolehan Suara 02", total_suara_02)
 
-            # Chart: Perolehan Suara dan Persentase TPS Masuk
-            st.subheader("Perolehan Suara dan Persentase TPS Masuk per Kecamatan")
+            # Layout untuk menampilkan dua chart berdampingan
+            col_chart1, col_chart2 = st.columns(2)
 
-            option_dual_bar = {
-                "tooltip": {"trigger": "axis", "axisPointer": {"type": "shadow"}},
-                "legend": {"data": ["Suara 01", "Suara 02", "Persentase TPS Masuk"], "top": "5%"},
-                "xAxis": [
-                    {"type": "value", "boundaryGap": [0, 0.01]},
-                    {"type": "value", "max": 100, "boundaryGap": [0, 0.01]}  # Skala persentase
-                ],
-                "yAxis": {
-                    "type": "category",
-                    "data": df_grouped['Kecamatan'].tolist()
-                },
-                "series": [
-                    {
-                        "name": "Suara 01",
-                        "type": "bar",
-                        "stack": "total",
-                        "label": {
-                            "show": True,
-                            "position": "inside",
-                            "formatter": "{c}"
-                        },
-                        "data": df_grouped['Suara 01'].tolist(),
-                        "itemStyle": {"color": "#fac858"}
-                    },
-                    {
-                        "name": "Suara 02",
-                        "type": "bar",
-                        "stack": "total",
-                        "label": {
-                            "show": True,
-                            "position": "inside",
-                            "formatter": "{c}"
-                        },
-                        "data": df_grouped['Suara 02'].tolist(),
-                        "itemStyle": {"color": "#5470c6"}
-                    },
-                    {
-                        "name": "Persentase TPS Masuk",
-                        "type": "bar",
-                        "xAxisIndex": 1,
-                        "label": {
-                            "show": True,
-                            "position": "outside",
-                            "formatter": "{c}%"
-                        },
-                        "data": df_grouped['Persentase TPS Masuk'].tolist(),
-                        "itemStyle": {"color": "#91cc75"}
-                    }
-                ]
-            }
+            # Chart 1: Dual Bar Chart (Perolehan Suara dan Persentase TPS Masuk)
+            with col_chart1:
+                st.subheader("Perolehan Suara dan Persentase TPS Masuk per Kecamatan")
 
-            st_echarts(options=option_dual_bar, height="600px")
+                option_dual_bar = {
+                    "tooltip": {"trigger": "axis", "axisPointer": {"type": "shadow"}},
+                    "legend": {"data": ["Suara 01", "Suara 02", "Persentase TPS Masuk"], "top": "5%"},
+                    "xAxis": [
+                        {"type": "value", "boundaryGap": [0, 0.01]},
+                        {"type": "value", "max": 100, "boundaryGap": [0, 0.01]}  # Skala persentase
+                    ],
+                    "yAxis": {
+                        "type": "category",
+                        "data": df_grouped['Kecamatan'].tolist()
+                    },
+                    "series": [
+                        {
+                            "name": "Suara 01",
+                            "type": "bar",
+                            "stack": "total",
+                            "label": {
+                                "show": True,
+                                "position": "inside",
+                                "formatter": "{c}"
+                            },
+                            "data": df_grouped['Suara 01'].tolist(),
+                            "itemStyle": {"color": "#fac858"}
+                        },
+                        {
+                            "name": "Suara 02",
+                            "type": "bar",
+                            "stack": "total",
+                            "label": {
+                                "show": True,
+                                "position": "inside",
+                                "formatter": "{c}"
+                            },
+                            "data": df_grouped['Suara 02'].tolist(),
+                            "itemStyle": {"color": "#5470c6"}
+                        },
+                        {
+                            "name": "Persentase TPS Masuk",
+                            "type": "bar",
+                            "xAxisIndex": 1,
+                            "label": {
+                                "show": True,
+                                "position": "outside",
+                                "formatter": "{c}%"
+                            },
+                            "data": df_grouped['Persentase TPS Masuk'].tolist(),
+                            "itemStyle": {"color": "#91cc75"}
+                        }
+                    ]
+                }
+
+                st_echarts(options=option_dual_bar, height="600px")
+
+            # Chart 2: Pie Chart Total Perolehan Suara
+            with col_chart2:
+                st.subheader("Total Perolehan Suara")
+
+                option_pie_chart = {
+                    "tooltip": {"trigger": "item"},
+                    "legend": {"top": "5%", "left": "center"},
+                    "series": [
+                        {
+                            "name": "Total Perolehan Suara",
+                            "type": "pie",
+                            "radius": "50%",
+                            "data": [
+                                {"value": total_suara_01, "name": "Suara 01", "itemStyle": {"color": "#fac858"}},
+                                {"value": total_suara_02, "name": "Suara 02", "itemStyle": {"color": "#5470c6"}}
+                            ],
+                            "emphasis": {
+                                "label": {
+                                    "show": True,
+                                    "fontSize": "20",
+                                    "fontWeight": "bold"
+                                }
+                            }
+                        }
+                    ]
+                }
+
+                st_echarts(options=option_pie_chart, height="600px")
     else:
         st.write("Tidak ada data yang ditemukan.")
 else:
