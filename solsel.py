@@ -54,6 +54,7 @@ if response.status_code == 200:
             df_grouped = df.groupby('Kecamatan', as_index=False).agg({
                 'Suara 01': 'sum',
                 'Suara 02': 'sum',
+                'DPT': 'sum',
                 'TPS Masuk': 'sum'
             })
             df_grouped['Total TPS'] = df.groupby('Kecamatan').size().values
@@ -66,6 +67,7 @@ if response.status_code == 200:
             total_suara_02 = int(df_grouped['Suara 02'].sum())
             total_dpt = int(df['DPT'].sum())
 
+            # Tampilan Metrik
             col1, col2, col3 = st.columns(3)
             with col1:
                 st.metric("Jumlah Kecamatan", df['Kecamatan'].nunique())
@@ -76,6 +78,8 @@ if response.status_code == 200:
 
             col4, col5 = st.columns(2)
             with col4:
+                st.metric("Total DPT", total_dpt)
+            with col5:
                 st.metric("Total Perolehan Suara 01", total_suara_01)
             with col5:
                 st.metric("Total Perolehan Suara 02", total_suara_02)
