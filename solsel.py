@@ -31,7 +31,7 @@ if response.status_code == 200:
         df.columns = df.columns.str.strip()
 
         # Tampilkan nama kolom untuk debugging
-        st.write("Kolom yang ditemukan:", df.columns.tolist())
+        #st.write("Kolom yang ditemukan:", df.columns.tolist())
 
         # Validasi keberadaan kolom yang diharapkan
         required_columns = ['Kecamatan', 'Suara 01', 'Suara 02', 'Suara Tidak Sah', 'DPT']
